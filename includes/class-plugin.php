@@ -147,7 +147,7 @@ final class Plugin
         }
 
         // Prevent duplicates based on hash of code and placement.
-        $hash = md5($placement . $code);
+        $hash = hash('sha256', $placement . $code);
         if (isset(self::$scripts_queue[$placement][$hash])) {
             return;
         }

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] - 2026-01-01
+### Fixed
+- **Security**: Replaced `md5()` with `sha256()` for script hashing to resolve Snyk/CWE-916 warnings.
+### Changed
+- **Releases**: GitHub releases now use semantic versioning (v1.0.2) instead of commit SHAs.
+
 ## [1.0.1] - 2026-01-01
 ### Added
 - GitHub Actions workflow for automatic release generation.

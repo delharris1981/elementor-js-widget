@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Custom JS Widget for Elementor
  * Description: A premium widget for Elementor that allows adding raw JavaScript to pages with execution placement control.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Custom Developer
  * Text Domain: custom-js-widget
  * Domain Path: /languages

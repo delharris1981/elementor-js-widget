@@ -17,22 +17,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get short SHA
-        id: slug
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Get Version
+        id: version
+        run: |
+          VERSION=$(grep "Version:" custom-elementor-js-widget.php | awk '{print $NF}')
+          echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Create Zip Package
         run: |
-          zip -r custom-js-widget-${{ steps.slug.outputs.sha_short }}.zip . -x "*.git*" "*/.agent/*" ".agent/*" ".github/*" "tests/*" "node_modules/*"
+          zip -r custom-js-widget-${{ steps.version.outputs.version }}.zip . -x "*.git*" "*/.agent/*" ".agent/*" ".github/*" "tests/*" "node_modules/*"
 
       - name: Create Release
         id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.slug.outputs.sha_short }}
-          name: Release ${{ steps.slug.outputs.sha_short }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.version }}
           draft: false
           prerelease: false
-          files: custom-js-widget-${{ steps.slug.outputs.sha_short }}.zip
+          files: custom-js-widget-${{ steps.version.outputs.version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
