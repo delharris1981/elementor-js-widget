@@ -1,0 +1,39 @@
+name: Create Release on Push
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.agent/**'
+      - '.github/**'
+      - 'README.md'
+      - 'CHANGELOG.md'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get short SHA
+        id: slug
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create Zip Package
+        run: |
+          zip -r custom-js-widget-${{ steps.slug.outputs.sha_short }}.zip . -x "*.git*" "*/.agent/*" ".agent/*" ".github/*" "tests/*" "node_modules/*"
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.slug.outputs.sha_short }}
+          name: Release ${{ steps.slug.outputs.sha_short }}
+          draft: false
+          prerelease: false
+          files: custom-js-widget-${{ steps.slug.outputs.sha_short }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
