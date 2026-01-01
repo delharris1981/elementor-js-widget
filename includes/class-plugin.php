@@ -73,7 +73,7 @@ final class Plugin
     {
         require_once CJSW_PLUGIN_DIR . 'includes/class-updater.php';
         // Note: Replace 'username/repo' with your actual repository.
-        new Updater(CJSW_PLUGIN_FILE, 'derek/elementor-js-widget');
+        new Updater(CJSW_PLUGIN_FILE, 'delharris1981/elementor-js-widget');
     }
 
     /**
