@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.1] - 2026-01-02
+### Fixed
+- **Duplicate Execution**: Fixed a bug where scripts placed in the "Header" were running twice (once on page load and once on the event).
+- **Execution Consistency**: Unified JS processing logic to ensure consistent behavior between early and late script enqueuing.
+
 ## [1.1.0] - 2026-01-02
 ### Added
 - **Execution Triggers**: Added "On Elementor Event" triggers (Immediate, Elementor Init, Popup Show, Custom Event).
