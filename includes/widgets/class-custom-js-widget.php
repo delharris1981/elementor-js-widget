@@ -184,15 +184,19 @@ class Custom_JS_Widget extends Widget_Base
         $trigger = $settings['trigger'] ?? 'immediate';
         $restrict_to_popup = 'yes' === ($settings['restrict_to_popup'] ?? 'no');
 
-        // 1. Handle Context Restriction (Popup check)
+        // Escape widget_id for unique variable naming
+        $safe_id = str_replace('-', '_', $widget_id);
+
+        // Core execution logic (including context check)
+        $execution_block = $js_code;
         if ($restrict_to_popup) {
-            $js_code = "if (jQuery('.elementor-element-{$widget_id}').closest('.elementor-location-popup').length > 0) {\n{$js_code}\n}";
+            $execution_block = "if (jQuery('.elementor-element-{$widget_id}').closest('.elementor-location-popup').length > 0) {\n{$js_code}\n}";
         }
 
-        // 2. Handle Triggers
+        // 1. Process based on trigger
         switch ($trigger) {
             case 'elementor_init':
-                $js_code = "jQuery(window).on('elementor/frontend/init', function() {\n{$js_code}\n});";
+                $wrapped_js = "jQuery(window).on('elementor/frontend/init.cjs_{$safe_id}', function() {\n{$execution_block}\n});";
                 break;
 
             case 'popup_show':
@@ -200,16 +204,39 @@ class Custom_JS_Widget extends Widget_Base
                 $condition = !empty($popup_id) ? "if (id == '{$popup_id}') {\n" : "";
                 $end_condition = !empty($popup_id) ? "\n}" : "";
 
-                $js_code = "jQuery(document).on('elementor/popup/show', function(event, id, instance) {\n{$condition}{$js_code}{$end_condition}\n});";
+                $wrapped_js = "
+                (function($){
+                    var run = function(id) {
+                        {$condition}{$execution_block}{$end_condition}
+                    };
+                    $(document).off('elementor/popup/show.cjs_{$safe_id}').on('elementor/popup/show.cjs_{$safe_id}', function(event, id, instance) {
+                        run(id);
+                    });
+                    // Fallback: If current widget is already within a visible popup, run now
+                    var \$popup = $('.elementor-element-{$widget_id}').closest('.elementor-location-popup');
+                    if (\$popup.length > 0) {
+                        run(\$popup.data('elementor-id'));
+                    }
+                })(jQuery);";
                 break;
 
             case 'custom_event':
                 $event_name = !empty($settings['custom_event_name']) ? trim($settings['custom_event_name']) : 'custom_js_event';
-                $js_code = "jQuery(document).on('{$event_name}', function() {\n{$js_code}\n});";
+                $wrapped_js = "jQuery(document).off('{$event_name}.cjs_{$safe_id}').on('{$event_name}.cjs_{$safe_id}', function() {\n{$execution_block}\n});";
+                break;
+
+            default:
+                $wrapped_js = $execution_block;
                 break;
         }
 
-        return $js_code;
+        // 2. Wrap in an initialize-once guard to prevent duplicate injections
+        return "
+        (function() {
+            if (window.cjs_script_ran_{$safe_id}) return;
+            window.cjs_script_ran_{$safe_id} = true;
+            {$wrapped_js}
+        })();";
     }
 
     /**

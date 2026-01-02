@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.2] - 2026-01-02
+### Fixed
+- **Improved Popup Lifecycle**: Added immediate fallback detection for scripts rendered inside already-active popups to fix timing issues.
+- **Namespaced Events**: Switched to namespaced jQuery events (`.cjs_ID`) to prevent duplicate listener attachments.
+- **Execution Guard**: Implemented unique initialization guards per widget instance to eliminate duplicate script execution.
+
 ## [1.1.1] - 2026-01-02
 ### Fixed
 - **Duplicate Execution**: Fixed a bug where scripts placed in the "Header" were running twice (once on page load and once on the event).
