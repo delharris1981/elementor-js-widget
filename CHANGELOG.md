@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-01-02
+### Added
+- **Execution Triggers**: Added "On Elementor Event" triggers (Immediate, Elementor Init, Popup Show, Custom Event).
+- **Popup Context**: Added ability to restrict scripts to run only when inside an Elementor Popup.
+- **Popup Filtering**: Added support for filtering "On Popup Show" by specific Popup ID.
+- **Editor UI**: Enhanced script placement placeholders to show active triggers.
+
 ## [1.0.2] - 2026-01-01
 ### Fixed
 - **Security**: Replaced `md5()` with `sha256()` for script hashing to resolve Snyk/CWE-916 warnings.
