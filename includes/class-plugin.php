@@ -202,7 +202,9 @@ final class Plugin
 
                 if ('header' === $placement && !empty($settings['js_code'])) {
                     $use_jquery = 'yes' === ($settings['use_jquery'] ?? 'no');
-                    self::enqueue_script('header', $settings['js_code'], $use_jquery);
+                    $widget_id = $element['id'] ?? '';
+                    $processed_code = Widgets\Custom_JS_Widget::get_processed_js($settings['js_code'], $settings, $widget_id);
+                    self::enqueue_script('header', $processed_code, $use_jquery);
                 }
             }
 

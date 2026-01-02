@@ -166,22 +166,23 @@ class Custom_JS_Widget extends Widget_Base
     }
 
     /**
-     * Render widget output on the frontend.
+     * Process the JS code based on trigger and restriction settings.
+     * 
+     * Shared between render() and Plugin's early enqueuing.
+     * 
+     * @param string $js_code   The raw JS code.
+     * @param array  $settings  The widget settings.
+     * @param string $widget_id The widget ID.
+     * @return string Processed JS code.
      */
-    protected function render(): void
+    public static function get_processed_js(string $js_code, array $settings, string $widget_id): string
     {
-        $settings = $this->get_settings_for_display();
-        $js_code = $settings['js_code'];
-
         if (empty($js_code)) {
-            return;
+            return '';
         }
 
-        $placement = $settings['placement'];
-        $use_jquery = 'yes' === $settings['use_jquery'];
         $trigger = $settings['trigger'] ?? 'immediate';
         $restrict_to_popup = 'yes' === ($settings['restrict_to_popup'] ?? 'no');
-        $widget_id = $this->get_id();
 
         // 1. Handle Context Restriction (Popup check)
         if ($restrict_to_popup) {
@@ -207,6 +208,27 @@ class Custom_JS_Widget extends Widget_Base
                 $js_code = "jQuery(document).on('{$event_name}', function() {\n{$js_code}\n});";
                 break;
         }
+
+        return $js_code;
+    }
+
+    /**
+     * Render widget output on the frontend.
+     */
+    protected function render(): void
+    {
+        $settings = $this->get_settings_for_display();
+        $js_code = $settings['js_code'];
+
+        if (empty($js_code)) {
+            return;
+        }
+
+        $placement = $settings['placement'];
+        $use_jquery = 'yes' === $settings['use_jquery'];
+        $trigger = $settings['trigger'] ?? 'immediate';
+
+        $js_code = self::get_processed_js($js_code, $settings, $this->get_id());
 
         // 3. Output the script
         if ('inline' === $placement) {
